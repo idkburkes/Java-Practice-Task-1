@@ -1,0 +1,101 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+
+/* 
+Request parser
+
+*/
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String url = reader.readLine();
+       String relevantSectionOfUrl = separateRelevantChars(url);
+        ArrayList<String> listOfStrings = createListOfUrlParameters(relevantSectionOfUrl);
+        desiredOutput(listOfStrings);
+
+    }
+
+           //Beefy method that displays the desired output based on the task conditions.
+    public static void desiredOutput(ArrayList<String> listOfStrings){
+        ArrayList<Object> objList = new ArrayList<>();
+        String parameterString = "";
+                for(String string : listOfStrings){
+                    if(string.substring(0, 3).equals("obj") && string.charAt(3) == '=') {
+                        objList.add(string.substring(4, string.length()));
+                        parameterString += "obj ";
+                    } else if(string.contains("=")){
+                        for(int i = 0; i < string.length(); i++){
+                            if(string.charAt(i) == '=') parameterString += string.substring(0, i) + " ";
+                        }
+                    } else parameterString += string + " ";
+
+                }
+
+        System.out.println(parameterString);
+        int counter = 1;
+                //Deals with calling the correct alert method based on the obj value
+        for(Object objects : objList){
+
+
+            boolean isADouble = true;
+            double doubleObj = 0;
+            String objectAsString = objects.toString();
+            for(int i = 0; i < objectAsString.length(); i++){
+
+
+                //This should get cleaned up. I couldn't think of how to compare a char to an instance of the Number class
+                if(objectAsString.charAt(i) != '0' && objectAsString.charAt(i) != '1' && objectAsString.charAt(i) != '2' &&
+                objectAsString.charAt(i) != '3' && objectAsString.charAt(i) != '4' && objectAsString.charAt(i) != '5' &&
+                objectAsString.charAt(i) != '6' && objectAsString.charAt(i) != '7' && objectAsString.charAt(i) != '8' &&
+                        objectAsString.charAt(i) != '9' && objectAsString.charAt(i) != '.') isADouble = false;
+
+            }
+            if(isADouble) {
+                doubleObj = Double.parseDouble(objectAsString);
+                alert(doubleObj);
+            } else if (!isADouble) alert(objectAsString);
+        }
+    }
+
+    //split parameters into separate chunks based on each & and place them into a list
+    public static ArrayList<String> createListOfUrlParameters(String parameterSection){
+        ArrayList<String> list = new ArrayList<>();
+        int lastBreakInString = 0;
+
+        for(int i = 0; i < parameterSection.length(); i++){
+            if(parameterSection.charAt(i) == '&') {
+                list.add(parameterSection.substring(lastBreakInString, i));
+                lastBreakInString = i + 1;
+            }
+            if( i == parameterSection.length() - 1){
+                list.add(parameterSection.substring(lastBreakInString, parameterSection.length()));
+            }
+        }
+        return list;
+    }
+
+   //Gets rid of everything before the first ? in a URL
+    public static String separateRelevantChars(String url){
+        char[] charArray = url.toCharArray();
+        String parameterSection = null;
+
+        for(int i = 0; i < charArray.length; i++){
+            if(charArray[i] == '?') {
+                 parameterSection = url.substring(i + 1, url.length());
+                break;
+            }
+        }
+ return parameterSection;
+    }
+
+    public static void alert(double value) {
+        System.out.println("double: " + value);
+    }
+
+    public static void alert(String value) {
+        System.out.println("String: " + value);
+    }
+}
